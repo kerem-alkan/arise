@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ARISE — Kilo Alma Sistemi</title>
+<meta name="theme-color" content="#050810">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810;
+  --panel:#0b1526cc;
+  --panel-solid:#0b1526;
+  --line:#1c3352;
+  --cyan:#33e0ff;
+  --cyan-dim:#33e0ff55;
+  --purple:#7c5cff;
+  --gold:#ffc94d;
+  --danger:#ff5470;
+  --txt:#e8f4ff;
+  --muted:#9fb3ce;
+  --ff-d:'Rajdhani',ui-sans-serif,system-ui,sans-serif;
+  --ff-b:'Barlow',ui-sans-serif,system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--ff-b);
+  background:var(--void);
+  color:var(--txt);
+  min-height:100dvh;
+  padding-bottom:calc(84px + env(safe-area-inset-bottom));
+  overflow-x:hidden;
+  position:relative;
+}
+/* ambient void */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(60% 40% at 50% -5%, #10254588 0%, transparent 70%),
+    radial-gradient(50% 35% at 85% 100%, #241a4d66 0%, transparent 70%),
+    var(--void);
+}
+body::after{ /* faint scanlines */
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,#33e0ff 3px 4px);
+}
+::selection{background:var(--cyan);color:#03121c}
+
+/* ---------- system window panel ---------- */
+.win{
+  position:relative;
+  background:var(--panel);
+  border:1px solid var(--line);
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+  padding:16px;
+  margin:0 0 14px;
+  backdrop-filter:blur(6px);
+}
+.win::before{ /* glow edge top */
+  content:"";position:absolute;top:0;left:14px;right:0;height:1px;
+  background:linear-gradient(90deg,var(--cyan),transparent 70%);
+  filter:drop-shadow(0 0 6px var(--cyan));
+}
+.win-title{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--ff-d);font-weight:700;font-size:.82rem;
+  letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;
+  margin-bottom:12px;
+}
+.win-title .sig{
+  width:18px;height:18px;flex:0 0 18px;border:1px solid var(--cyan);
+  display:grid;place-items:center;font-size:.7rem;color:var(--cyan);
+  clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+  text-shadow:0 0 8px var(--cyan);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 4px var(--cyan-dim)}50%{box-shadow:0 0 14px var(--cyan-dim)}}
+
+.wrap{max-width:640px;margin:0 auto;padding:14px 14px 0}
+
+/* ---------- header / status ---------- */
+header.status{padding-top:6px}
+.sys-tag{
+  font-family:var(--ff-d);font-size:.72rem;letter-spacing:.35em;color:var(--muted);
+  text-transform:uppercase;text-align:center;margin-bottom:10px;
+}
+.sys-tag b{color:var(--cyan);text-shadow:0 0 10px var(--cyan-dim)}
+.hunter{display:flex;align-items:center;gap:14px}
+.rank-badge{
+  width:64px;height:64px;flex:0 0 64px;position:relative;
+  display:grid;place-items:center;
+  font-family:var(--ff-d);font-weight:700;font-size:1.9rem;color:var(--cyan);
+  text-shadow:0 0 14px var(--cyan);
+}
+.rank-badge svg{position:absolute;inset:0;width:100%;height:100%}
+.rank-badge polygon{fill:#0d1e36;stroke:var(--cyan);stroke-width:1.5;filter:drop-shadow(0 0 6px var(--cyan-dim))}
+.h-name{font-family:var(--ff-d);font-weight:700;font-size:1.5rem;letter-spacing:.12em;line-height:1}
+.h-sub{font-size:.78rem;color:var(--muted);margin-top:4px;letter-spacing:.05em}
+.h-sub b{color:var(--gold)}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat{
+  background:#08101f;border:1px solid var(--line);padding:9px 8px;text-align:center;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+}
+.stat .k{font-size:.62rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.stat .v{font-family:var(--ff-d);font-weight:700;font-size:1.25rem;color:var(--txt);margin-top:2px}
+.stat .v small{font-size:.7rem;color:var(--muted);font-weight:600}
+.xp-line{margin-top:14px}
+.xp-lbl{display:flex;justify-content:space-between;font-size:.68rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.xp-lbl b{color:var(--cyan)}
+.bar{height:10px;background:#081120;border:1px solid var(--line);position:relative;overflow:hidden;
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px)}
+.bar>i{display:block;height:100%;width:0%;
+  background:linear-gradient(90deg,var(--purple),var(--cyan));
+  box-shadow:0 0 12px var(--cyan-dim);transition:width .5s ease}
+
+/* ---------- tabs ---------- */
+nav.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:#070d1af2;border-top:1px solid var(--line);
+  backdrop-filter:blur(10px);
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  display:flex;gap:6px;justify-content:center;
+}
+nav.tabs button{
+  flex:1;max-width:150px;background:transparent;border:1px solid transparent;color:var(--muted);
+  font-family:var(--ff-d);font-weight:600;font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:10px 4px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+  transition:color .2s,background .2s;
+}
+nav.tabs button .ico{font-size:1.05rem;line-height:1;filter:grayscale(1) opacity(.6)}
+nav.tabs button.on{color:var(--cyan);background:#0e1c33;border-color:var(--line)}
+nav.tabs button.on .ico{filter:none}
+section.page{display:none;animation:fadein .3s ease}
+section.page.on{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- quests ---------- */
+.daychips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
+.daychips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;font-family:var(--ff-d);font-weight:600;font-size:.78rem;letter-spacing:.1em;
+  color:var(--muted);background:#08101f;border:1px solid var(--line);padding:7px 13px;cursor:pointer;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+}
+.chip.on{color:#03121c;background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 12px var(--cyan-dim)}
+.chip.today:not(.on){color:var(--cyan)}
+.qmeta{display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--muted);margin-bottom:10px}
+.qmeta .mode{font-family:var(--ff-d);font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.qmeta .mode.train{color:var(--danger)}
+.qmeta .mode.rest{color:var(--purple)}
+ul.quests{list-style:none}
+ul.quests li{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:11px 4px;border-bottom:1px dashed #16283f;cursor:pointer;user-select:none;
+}
+ul.quests li:last-child{border-bottom:none}
+.q-time{font-family:var(--ff-d);font-weight:700;font-size:.85rem;color:var(--cyan);flex:0 0 44px;padding-top:1px;letter-spacing:.03em}
+.q-body{flex:1}
+.q-name{font-weight:600;font-size:.92rem}
+.q-det{font-size:.78rem;color:var(--muted);margin-top:2px;line-height:1.45}
+.q-box{
+  flex:0 0 22px;width:22px;height:22px;margin-top:1px;border:1.5px solid var(--line);
+  display:grid;place-items:center;color:transparent;font-size:.8rem;
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+  transition:all .2s;
+}
+li.done .q-box{background:var(--cyan);border-color:var(--cyan);color:#03121c;box-shadow:0 0 10px var(--cyan-dim)}
+li.done .q-name{color:var(--muted);text-decoration:line-through}
+.q-note{font-size:.74rem;color:var(--muted);border-left:2px solid var(--purple);padding:6px 10px;margin-top:10px;background:#0a1424}
+
+/* completion flash */
+#flash{
+  position:fixed;inset:0;z-index:100;display:none;place-items:center;background:#02060fd9;
+  backdrop-filter:blur(4px);text-align:center;padding:20px;
+}
+#flash.show{display:grid;animation:fadein .25s ease}
+#flash .fwin{max-width:340px;width:100%}
+#flash h2{font-family:var(--ff-d);font-weight:700;font-size:1.6rem;letter-spacing:.3em;color:var(--cyan);text-shadow:0 0 20px var(--cyan);margin-bottom:8px}
+#flash p{color:var(--muted);font-size:.9rem;margin-bottom:6px}
+#flash .xpgain{font-family:var(--ff-d);font-weight:700;font-size:1.1rem;color:var(--gold);letter-spacing:.15em;margin-bottom:16px}
+#flash button{
+  font-family:var(--ff-d);font-weight:700;letter-spacing:.2em;font-size:.85rem;
+  background:var(--cyan);color:#03121c;border:none;padding:12px 30px;cursor:pointer;
+  clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);
+}
+
+/* ---------- training ---------- */
+.skill{border-bottom:1px dashed #16283f;padding:13px 2px}
+.skill:last-child{border-bottom:none}
+.skill .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.skill .nm{font-family:var(--ff-d);font-weight:700;font-size:1.02rem;letter-spacing:.06em}
+.skill .nm span{color:var(--cyan);margin-right:6px}
+.skill .rx{font-family:var(--ff-d);font-weight:700;font-size:.8rem;color:var(--gold);letter-spacing:.08em;white-space:nowrap}
+.skill .cue{font-size:.8rem;color:var(--muted);margin-top:4px;line-height:1.5}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tag{font-family:var(--ff-d);font-weight:600;font-size:.7rem;letter-spacing:.12em;color:var(--purple);
+  border:1px solid #33285e;background:#120f28;padding:4px 10px;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.tag.c{color:var(--cyan);border-color:var(--line);background:#08131f}
+
+/* ---------- nutrition ---------- */
+.shake-hl{
+  border:1px solid #2a4a2f;background:#0a1a10cc;
+}
+.shake-hl .win-title{color:#5dffa4}
+.shake-hl::before{background:linear-gradient(90deg,#5dffa4,transparent 70%);filter:drop-shadow(0 0 6px #5dffa4)}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:12px;padding:8px 0;font-size:.9rem;line-height:1.5}
+.steps li::before{
+  content:counter(s,decimal-leading-zero);font-family:var(--ff-d);font-weight:700;color:var(--cyan);
+  font-size:.85rem;flex:0 0 26px;padding-top:2px;
+}
+.steps b{color:var(--gold)}
+.mrow{display:flex;gap:10px;padding:9px 2px;border-bottom:1px dashed #16283f;font-size:.88rem;align-items:baseline}
+.mrow:last-child{border-bottom:none}
+.mrow .d{font-family:var(--ff-d);font-weight:700;color:var(--cyan);flex:0 0 42px;font-size:.85rem;letter-spacing:.05em}
+.mrow .m{flex:1;line-height:1.45}
+.mrow .m small{display:block;color:var(--muted)}
+.kcal{font-family:var(--ff-d);font-weight:700;font-size:.75rem;color:var(--gold);letter-spacing:.06em}
+.note-p{font-size:.82rem;color:var(--muted);line-height:1.55}
+.note-p b{color:var(--txt)}
+
+/* ---------- tracking ---------- */
+.winput{display:flex;gap:8px;margin-bottom:10px}
+.winput input{
+  flex:1;background:#08101f;border:1px solid var(--line);color:var(--txt);
+  font-family:var(--ff-d);font-weight:700;font-size:1.15rem;padding:11px 14px;outline:none;min-width:0;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+}
+.winput input:focus{border-color:var(--cyan);box-shadow:0 0 10px var(--cyan-dim)}
+.winput button{
+  font-family:var(--ff-d);font-weight:700;letter-spacing:.14em;font-size:.8rem;
+  background:var(--cyan);color:#03121c;border:none;padding:0 22px;cursor:pointer;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+}
+.wmsg{font-size:.78rem;min-height:18px;margin-bottom:8px}
+.wmsg.ok{color:#5dffa4}.wmsg.warn{color:var(--gold)}
+table.track{width:100%;border-collapse:collapse;font-size:.84rem}
+table.track th{
+  font-family:var(--ff-d);font-weight:700;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);text-align:left;padding:6px 6px;border-bottom:1px solid var(--line);
+}
+table.track td{padding:7px 6px;border-bottom:1px dashed #142238}
+table.track tr.today td{background:#0d1e36;color:var(--cyan)}
+table.track td.a{font-family:var(--ff-d);font-weight:700}
+table.track td.a.hit{color:#5dffa4}
+table.track td.a.miss{color:var(--gold)}
+.resetline{margin-top:12px;text-align:center}
+.resetline button{
+  background:none;border:1px solid var(--line);color:var(--muted);font-size:.72rem;
+  font-family:var(--ff-d);letter-spacing:.12em;padding:8px 16px;cursor:pointer;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+}
+.rules li{font-size:.85rem;color:var(--muted);line-height:1.6;padding:5px 0;list-style:none;display:flex;gap:10px}
+.rules li::before{content:"▸";color:var(--cyan);flex:0 0 12px}
+.footer-sig{text-align:center;font-size:.66rem;letter-spacing:.3em;color:#3a5273;text-transform:uppercase;padding:14px 0 6px;font-family:var(--ff-d)}
+
+@media (min-width:640px){
+  .wrap{padding-top:24px}
+  nav.tabs button{font-size:.8rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- STATUS -->
+  <header class="status">
+    <div class="sys-tag">■ <b>SİSTEM</b> — GÜNLÜK GÖREV PENCERESİ AÇILDI ■</div>
+    <div class="win">
+      <div class="hunter">
+        <div class="rank-badge">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="32,2 60,17 60,47 32,62 4,47 4,17"/></svg>
+          <span id="rankLetter">E</span>
+        </div>
+        <div>
+          <div class="h-name">KEREM</div>
+          <div class="h-sub">Sınıf: <b id="rankName">Acemi Avcı</b> · Görev: <span style="color:var(--txt)">Kütle Protokolü</span></div>
+        </div>
+      </div>
+      <div class="statgrid">
+        <div class="stat"><div class="k">Gün</div><div class="v" id="stDay">1<small>/31</small></div></div>
+        <div class="stat"><div class="k">Kilo</div><div class="v" id="stW">61.5<small> kg</small></div></div>
+        <div class="stat"><div class="k">Hedef</div><div class="v">64.5<small> kg</small></div></div>
+      </div>
+      <div class="xp-line">
+        <div class="xp-lbl"><span>Bugünün Görevleri</span><b id="xpTxt">0%</b></div>
+        <div class="bar"><i id="xpBar"></i></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- GÖREVLER -->
+  <section class="page on" id="pg-quests">
+    <div class="daychips" id="dayChips"></div>
+    <div class="win">
+      <div class="win-title"><span class="sig">!</span> Günlük Görev</div>
+      <div class="qmeta"><span id="qDayName">—</span><span class="mode" id="qMode">—</span></div>
+      <ul class="quests" id="questList"></ul>
+      <div class="q-note" id="qShiftNote">Vardiyan 12:00–21:00 ise bütün saatleri 1 saat kaydır. Shake 2 asla 23:30'u geçmesin.</div>
+    </div>
+  </section>
+
+  <!-- ANTRENMAN -->
+  <section class="page" id="pg-train">
+    <div class="win">
+      <div class="win-title"><span class="sig">⚔</span> Beceri Ağacı — Pzt · Çar · Cmt</div>
+      <div class="tagrow">
+        <span class="tag c">30 DK</span><span class="tag c">SET ARASI 60–90 SN</span><span class="tag">HAFTALIK +1 TEKRAR</span>
+      </div>
+      <div class="skill"><div class="top"><div class="nm"><span>01</span>Şınav</div><div class="rx">3 × MAKS</div></div>
+        <div class="cue">Eller omuz genişliğinde, vücut düz çizgi, göğüs yere yaklaşsın. 5'ten az çıkıyorsa masaya dayalı eğimli şınavla başla.</div></div>
+      <div class="skill"><div class="top"><div class="nm"><span>02</span>Barfiks</div><div class="rx">3 × MAKS</div></div>
+        <div class="cue">Çıkaramıyorsan bandı çubuğa as, ayağını içine koy (asistanslı) — veya zıplayıp çık, 3-4 saniyede yavaş in (negatif). Birkaç haftada gelir.</div></div>
+      <div class="skill"><div class="top"><div class="nm"><span>03</span>Bantla Row</div><div class="rx">3 × 12</div></div>
+        <div class="cue">Bandı çubuğa/kapı koluna tak, dirsekleri geriye çekerken kürek kemiklerini sık. Omuz duruşun için en kritik hareket — asla atlama.</div></div>
+      <div class="skill"><div class="top"><div class="nm"><span>04</span>Squat</div><div class="rx">3 × 15</div></div>
+        <div class="cue">Topuklar yerde, kalça geriye, sandalyeye oturur gibi. Kolaylaşınca bandı omuzlarından geçir.</div></div>
+      <div class="skill"><div class="top"><div class="nm"><span>05</span>Bantla Omuz Pres</div><div class="rx">3 × 12</div></div>
+        <div class="cue">Bandın ortasına bas, uçlarını omuz hizasından yukarı it.</div></div>
+      <div class="skill"><div class="top"><div class="nm"><span>06</span>Plank</div><div class="rx">3 × 30 SN</div></div>
+        <div class="cue">Dirsekler yerde, vücut düz, kalça düşmesin. Kolaylaşınca 45-60 saniyeye çık. Mekik istersen ayrıca 3×15 ekle.</div></div>
+    </div>
+    <div class="win">
+      <div class="win-title"><span class="sig">▲</span> Yükselme Kuralı</div>
+      <p class="note-p">Her hafta her sette <b>+1 tekrar</b> hedefle ve sayılarını not et ("Şınav 8-7-6" gibi). Bir harekette 3×15 rahatlayınca zorlaştır: bandı kısalt, tempoyu yavaşlat, ayakları yükselt. Kas yanması normal — sırtta/belde <b>keskin batıcı ağrı</b> olursa o hareketi bırak.</p>
+    </div>
+  </section>
+
+  <!-- BESLENME -->
+  <section class="page" id="pg-food">
+    <div class="win shake-hl">
+      <div class="win-title"><span class="sig">۞</span> İksir: Gainer Shake — Günde 2×</div>
+      <ol class="steps">
+        <li>Shaker'a önce <b>300 ml tam yağlı süt</b> (300 çizgisi)</li>
+        <li>Üzerine <b>4 tepeleme yemek kaşığı gainer</b> (~80 g — 1 tepeleme kaşık ≈ 20 g)</li>
+        <li>Kapat, 20-30 saniye çalkala → <b>~500 kcal</b></li>
+      </ol>
+      <p class="note-p" style="margin-top:8px">Süt yoksa: 350 ml su + 5 tepeleme kaşık. Kreatin saşesini istediğin 2 shake'e yarımşar paket kat, bitir. Günlük toz 160 g → 5 kg kutu ≈ 31 gün.</p>
+    </div>
+
+    <div class="win">
+      <div class="win-title"><span class="sig">☀</span> Kahvaltı — Her Gün <span class="kcal" style="margin-left:auto">~750 KCAL</span></div>
+      <p class="note-p" style="margin-bottom:10px"><b>Temel:</b> 2-3 yumurta + 2-3 dilim peynir + zeytin + 3-4 dilim ekmek. Üzerine günün ekstrası:</p>
+      <div class="mrow"><span class="d">Pzt·Per</span><span class="m">2 kaşık tahin-pekmez</span></div>
+      <div class="mrow"><span class="d">Sal·Cum</span><span class="m">Bal/reçel + tereyağı</span></div>
+      <div class="mrow"><span class="d">Çar·Cmt</span><span class="m">1 avuç ceviz + 1 muz</span></div>
+      <div class="mrow"><span class="d">Paz</span><span class="m">Menemen (3 yumurta) + bol ekmek</span></div>
+    </div>
+
+    <div class="win">
+      <div class="win-title"><span class="sig">◈</span> Öğle — AVM Rotasyonu <span class="kcal" style="margin-left:auto">~850 KCAL</span></div>
+      <div class="mrow"><span class="d">Pzt</span><span class="m">Tavuk Dünyası: tavuk şiş/pirzola + pilav + ekmek<small>+ ayran</small></span></div>
+      <div class="mrow"><span class="d">Sal</span><span class="m">Makarnam: tavuklu kremalı makarna (büyük boy)<small>+ ayran</small></span></div>
+      <div class="mrow"><span class="d">Çar</span><span class="m">Lokanta: kuru fasulye + pilav + cacık<small>+ ayran</small></span></div>
+      <div class="mrow"><span class="d">Per</span><span class="m">Tavuk Dünyası: tavuk döner dürüm + pilav<small>+ ayran</small></span></div>
+      <div class="mrow"><span class="d">Cum</span><span class="m">Greensalads: tavuklu wrap + patates<small>+ ayran</small></span></div>
+      <div class="mrow"><span class="d">Cmt</span><span class="m">Makarnam: bolonez / köri tavuklu makarna<small>+ ayran</small></span></div>
+      <div class="mrow"><span class="d">Paz</span><span class="m">İzindeysen evde: makarna + kıyma/tavuk, büyük porsiyon</span></div>
+      <p class="note-p" style="margin-top:10px"><b>Kural:</b> Tabakta pilav/makarna/ekmek hep olacak. "Hafif menü" seçmek yasak.</p>
+    </div>
+
+    <div class="win">
+      <div class="win-title"><span class="sig">✦</span> Ara Öğün & Akşam</div>
+      <div class="mrow"><span class="d">17:30</span><span class="m">1 avuç kuruyemiş + 1 muz <small>haftalık al, poşetle çantada taşı — ~300 kcal</small></span></div>
+      <div class="mrow"><span class="d">21:30</span><span class="m">Ev yemeğinin büyük porsiyonu + değişmez üçlü: 2 dilim ekmek, 1 kase yoğurt, yemeğe 1 kaşık zeytinyağı <small>~700 kcal</small></span></div>
+    </div>
+  </section>
+
+  <!-- TAKİP -->
+  <section class="page" id="pg-track">
+    <div class="win">
+      <div class="win-title"><span class="sig">⚖</span> Kilo Kaydı — Bugün</div>
+      <p class="note-p" style="margin-bottom:10px">Her sabah: tuvaletten sonra, kahvaltıdan önce, aynı kıyafetle. Günlük ±0,3-0,5 kg oynama normal — trende bak.</p>
+      <div class="winput">
+        <input type="number" id="wIn" step="0.1" min="50" max="90" inputmode="decimal" placeholder="61.5 kg">
+        <button id="wSave">KAYDET</button>
+      </div>
+      <div class="wmsg" id="wMsg"></div>
+    </div>
+    <div class="win">
+      <div class="win-title"><span class="sig">▤</span> 31 Günlük Tablo</div>
+      <table class="track">
+        <thead><tr><th>Gün</th><th>Tarih</th><th>Tahmin</th><th>Gerçek</th></tr></thead>
+        <tbody id="trackBody"></tbody>
+      </table>
+      <div class="resetline"><button id="resetDay">GÜN 1'İ BUGÜNE SIFIRLA</button></div>
+    </div>
+    <div class="win">
+      <div class="win-title"><span class="sig">§</span> Altın Kurallar</div>
+      <ul class="rules">
+        <li>Shake asla öğün yerine geçmez — hep öğünün üstüne biner.</li>
+        <li>Günde 2,5-3 litre su. Shaker'ı işte su şişesi olarak da kullan.</li>
+        <li>Öğün atlamak yok; atladıysan kuruyemişle telafi et.</li>
+        <li>3 gün üst üste tahminin 0,5 kg altındaysan → shake'e yarım muz / 1 kaşık fıstık ezmesi ekle.</li>
+        <li>2. haftadan sonra haftada +1 kg'dan hızlıysan → shake sütünü 200 ml'ye düşür.</li>
+        <li>Her Cuma: haftalık kilolar + antrenman sayıları → Claude'a rapor.</li>
+      </ul>
+    </div>
+    <div class="footer-sig">ARISE · KÜTLE PROTOKOLÜ v1</div>
+  </section>
+</div>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="on" data-pg="pg-quests"><span class="ico">📜</span>Görevler</button>
+  <button data-pg="pg-train"><span class="ico">⚔️</span>Antrenman</button>
+  <button data-pg="pg-food"><span class="ico">🍗</span>Beslenme</button>
+  <button data-pg="pg-track"><span class="ico">📈</span>Takip</button>
+</nav>
+
+<!-- COMPLETION FLASH -->
+<div id="flash">
+  <div class="win fwin">
+    <h2>GÖREV TAMAM</h2>
+    <p>Bugünün tüm görevleri yerine getirildi.</p>
+    <div class="xpgain">+100 XP KAZANILDI</div>
+    <button id="flashOk">DEVAM ET</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------------- data ---------------- */
+const BASE_W = 61.5, TOTAL_DAYS = 31;
+const DAYS_TR = ["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
+const DAYS_SHORT = ["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
+const TRAIN_DAYS = [1,3,6]; // Mon, Wed, Sat
+const BONUS = {1:"2 kaşık tahin-pekmez",4:"2 kaşık tahin-pekmez",2:"bal/reçel + tereyağı",5:"bal/reçel + tereyağı",3:"1 avuç ceviz + 1 muz",6:"1 avuç ceviz + 1 muz",0:"menemen (3 yumurta) + bol ekmek"};
+const LUNCH = {
+ 1:"Tavuk Dünyası: tavuk şiş/pirzola + pilav + ekmek + ayran",
+ 2:"Makarnam: tavuklu kremalı makarna (büyük) + ayran",
+ 3:"Lokanta: kuru fasulye + pilav + cacık + ayran",
+ 4:"Tavuk Dünyası: tavuk döner dürüm + pilav + ayran",
+ 5:"Greensalads: tavuklu wrap + patates + ayran",
+ 6:"Makarnam: bolonez/köri tavuklu makarna + ayran",
+ 0:"Evde: makarna + kıyma/tavuk, büyük porsiyon"
+};
+function questsFor(dow){
+  const train = TRAIN_DAYS.includes(dow);
+  const q = [];
+  q.push({id:"wake", t:"08:30", n:"Uyan + 1 büyük bardak su", d:"Sistem çevrimiçi. Tartılma günüyse önce tartıl."});
+  q.push({id:"bf",   t:"09:00", n:"Kahvaltı", d:"Yumurta + peynir + zeytin + ekmek + "+BONUS[dow]});
+  if(train){
+    q.push({id:"tr", t:"09:50", n:"Antrenman (30 dk)", d:"Şınav → Barfiks → Row → Squat → Omuz Pres → Plank. Detay: Antrenman sekmesi."});
+    q.push({id:"s1", t:"10:20", n:"SHAKE 1 — antrenman sonrası", d:"300 ml süt + 4 tepeleme kaşık gainer"});
+  } else {
+    q.push({id:"s1", t:"10:15", n:"SHAKE 1", d:"300 ml süt + 4 tepeleme kaşık gainer — işe çıkmadan"});
+  }
+  q.push({id:"ln", t:"14:30", n:"Öğle yemeği (AVM)", d:LUNCH[dow]});
+  q.push({id:"sn", t:"17:30", n:"Ara öğün", d:"1 avuç kuruyemiş + 1 muz (çantandan)"});
+  q.push({id:"dn", t:"21:30", n:"Akşam yemeği", d:"Büyük porsiyon + 2 dilim ekmek + yoğurt + 1 kaşık zeytinyağı"});
+  q.push({id:"s2", t:"23:00", n:"SHAKE 2 — yatmadan", d:"300 ml süt + 4 tepeleme kaşık gainer"});
+  q.push({id:"sl", t:"23:30", n:"Uyku", d:"8 saat. Kas uykuda inşa edilir."});
+  return {train,q};
+}
+function expectedW(day){
+  const w1=[0,.2,.4,.5,.6,.7,.9];
+  if(day<1) day=1;
+  if(day<=7) return BASE_W + w1[day-1];
+  return Math.round((BASE_W + .9 + (day-7)*0.07)*10)/10;
+}
+function rankFor(day){
+  if(day<=7)  return ["E","Acemi Avcı"];
+  if(day<=14) return ["D","Çaylak Avcı"];
+  if(day<=21) return ["C","Deneyimli Avcı"];
+  if(day<=28) return ["B","Elit Avcı"];
+  return ["A","Gölge Avcısı"];
+}
+/* ---------------- storage ---------------- */
+const KEY="arise-fitness-v1";
+let state={start:null,checks:{},weights:{}};
+let memOnly=false;
+async function load(){
+  let raw=null;
+  try{ const r=await window.storage.get(KEY); if(r&&r.value) raw=r.value; }catch(e){}
+  if(raw===null){ try{ raw=localStorage.getItem(KEY); }catch(e){} }
+  if(raw){ try{ state=Object.assign(state,JSON.parse(raw)); }catch(e){} }
+  if(!state.start){ state.start=todayStr(); await save(); }
+}
+async function save(){
+  const raw=JSON.stringify(state);
+  let ok=false;
+  try{ await window.storage.set(KEY,raw); ok=true; }catch(e){}
+  if(!ok){ try{ localStorage.setItem(KEY,raw); ok=true; }catch(e){} }
+  memOnly=!ok;
+}
+/* ---------------- date utils ---------------- */
+function todayStr(d){ d=d||new Date(); const p=n=>String(n).padStart(2,"0");
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
+function dateFromStr(s){ const a=s.split("-"); return new Date(+a[0],+a[1]-1,+a[2]); }
+function addDays(s,n){ const d=dateFromStr(s); d.setDate(d.getDate()+n); return todayStr(d); }
+function dayNumber(){
+  const ms=dateFromStr(todayStr())-dateFromStr(state.start);
+  return Math.max(1,Math.min(TOTAL_DAYS,Math.round(ms/86400000)+1));
+}
+/* ---------------- render: header ---------------- */
+function renderHeader(){
+  const dn=dayNumber();
+  const [rl,rn]=rankFor(dn);
+  document.getElementById("rankLetter").textContent=rl;
+  document.getElementById("rankName").textContent=rn;
+  document.getElementById("stDay").innerHTML=dn+"<small>/"+TOTAL_DAYS+"</small>";
+  const ws=Object.keys(state.weights).sort();
+  const lastW=ws.length?state.weights[ws[ws.length-1]]:BASE_W;
+  document.getElementById("stW").innerHTML=Number(lastW).toFixed(1)+"<small> kg</small>";
+  renderXP();
+}
+function renderXP(){
+  const t=todayStr();
+  const dow=new Date().getDay();
+  const total=questsFor(dow).q.length;
+  const done=Object.keys(state.checks[t]||{}).length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById("xpTxt").textContent=pct+"%";
+  document.getElementById("xpBar").style.width=pct+"%";
+}
+/* ---------------- render: quests ---------------- */
+let viewDow=new Date().getDay();
+function renderChips(){
+  const wrap=document.getElementById("dayChips"); wrap.innerHTML="";
+  const order=[1,2,3,4,5,6,0];
+  order.forEach(d=>{
+    const b=document.createElement("button");
+    b.className="chip"+(d===viewDow?" on":"")+(d===new Date().getDay()?" today":"");
+    b.textContent=DAYS_SHORT[d]+(TRAIN_DAYS.includes(d)?" ⚔":"");
+    b.onclick=()=>{viewDow=d;renderChips();renderQuests();};
+    wrap.appendChild(b);
+  });
+}
+function renderQuests(){
+  const {train,q}=questsFor(viewDow);
+  const isToday=viewDow===new Date().getDay();
+  document.getElementById("qDayName").textContent=DAYS_TR[viewDow]+(isToday?" · BUGÜN":" · önizleme");
+  const mode=document.getElementById("qMode");
+  mode.textContent=train?"ANTRENMAN GÜNÜ":"DİNLENME GÜNÜ";
+  mode.className="mode "+(train?"train":"rest");
+  const ul=document.getElementById("questList"); ul.innerHTML="";
+  const t=todayStr();
+  q.forEach(item=>{
+    const li=document.createElement("li");
+    const done=isToday&&state.checks[t]&&state.checks[t][item.id];
+    if(done)li.classList.add("done");
+    li.innerHTML='<span class="q-time">'+item.t+'</span>'+
+      '<span class="q-body"><span class="q-name">'+item.n+'</span><span class="q-det">'+item.d+'</span></span>'+
+      '<span class="q-box">✓</span>';
+    if(isToday){
+      li.onclick=async()=>{
+        state.checks[t]=state.checks[t]||{};
+        if(state.checks[t][item.id]) delete state.checks[t][item.id];
+        else state.checks[t][item.id]=true;
+        await save();
+        renderQuests(); renderXP();
+        if(Object.keys(state.checks[t]).length===q.length) showFlash();
+      };
+    } else { li.style.cursor="default"; li.style.opacity=".75"; }
+    ul.appendChild(li);
+  });
+}
+function showFlash(){ document.getElementById("flash").classList.add("show"); }
+document.getElementById("flashOk").onclick=()=>document.getElementById("flash").classList.remove("show");
+/* ---------------- render: tracking ---------------- */
+function renderTrack(){
+  const body=document.getElementById("trackBody"); body.innerHTML="";
+  const t=todayStr();
+  for(let d=1;d<=TOTAL_DAYS;d++){
+    const ds=addDays(state.start,d-1);
+    const exp=expectedW(d);
+    const act=state.weights[ds];
+    const dt=dateFromStr(ds);
+    const tr=document.createElement("tr");
+    if(ds===t)tr.classList.add("today");
+    let actCell="—", cls="";
+    if(act!=null){ cls=act>=exp-0.3?" hit":" miss"; actCell=Number(act).toFixed(1); }
+    tr.innerHTML="<td>"+d+"</td><td>"+dt.getDate()+" "+["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][dt.getMonth()]+" "+DAYS_SHORT[dt.getDay()]+"</td>"+
+      "<td>"+exp.toFixed(1)+"</td><td class='a"+cls+"'>"+actCell+"</td>";
+    body.appendChild(tr);
+  }
+}
+document.getElementById("wSave").onclick=async()=>{
+  const v=parseFloat(document.getElementById("wIn").value.replace(",","."));
+  const msg=document.getElementById("wMsg");
+  if(isNaN(v)||v<40||v>120){ msg.textContent="Geçerli bir kilo gir (ör. 61.5)"; msg.className="wmsg warn"; return; }
+  state.weights[todayStr()]=v;
+  await save();
+  const exp=expectedW(dayNumber());
+  if(v>=exp-0.3){ msg.textContent="Kaydedildi ✓ Hedef çizgisindesin. ("+(memOnly?"Not: kayıt bu oturumla sınırlı":"kalıcı kayıt")+")"; msg.className="wmsg ok"; }
+  else { msg.textContent="Kaydedildi ✓ Tahminin biraz altında — 3 gün sürerse shake'e takviye ekle."; msg.className="wmsg warn"; }
+  renderHeader(); renderTrack();
+};
+document.getElementById("resetDay").onclick=async()=>{
+  if(!confirm("Gün 1 bugüne alınsın mı? Tablo tarihleri yeniden hesaplanır.")) return;
+  state.start=todayStr(); await save(); renderHeader(); renderTrack();
+};
+/* ---------------- tabs ---------------- */
+document.querySelectorAll("nav.tabs button").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.remove("on"));
+    document.querySelectorAll("section.page").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    document.getElementById(b.dataset.pg).classList.add("on");
+    window.scrollTo({top:0});
+  };
+});
+/* ---------------- init ---------------- */
+load().then(()=>{ renderHeader(); renderChips(); renderQuests(); renderTrack(); });
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
